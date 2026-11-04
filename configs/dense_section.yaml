@@ -1,0 +1,26 @@
+name: dense_section
+description: Dense retrieval only over section-aware chunks. Isolates the chunking change.
+collection: biq_section
+
+embedding:
+  model_name: BAAI/bge-base-en-v1.5
+  revision: a5beb1e3e68b9ab74eb54cfd186867f64f240e1a
+
+chunking:
+  strategy: section
+  target_tokens: 350
+  overlap_tokens: 60
+  max_tokens: 600
+  min_tokens: 40
+
+retrieval:
+  dense: true
+  lexical: false
+  dense_top_k: 30
+  fusion: none
+  age_filter: pre
+  final_top_k: 5
+  min_score: 0.30
+
+rerank:
+  enabled: false

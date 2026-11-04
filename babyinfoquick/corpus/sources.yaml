@@ -1,0 +1,77 @@
+sources:
+  - doc_id: cdc_milestone_checklists
+    title: CDC Learn the Signs Act Early Milestone Checklists, 2 Months to 5 Years
+    url: https://www.cdc.gov/act-early/media/pdfs/2025/10/cdc-milestone-checklists-ltsae-english-508.pdf
+    publisher: CDC
+    doc_type: milestone_checklist
+    age_months: [0, 36]
+
+  - doc_id: cdc_child_immunization_schedule
+    title: CDC Recommended Child and Adolescent Immunization Schedule
+    url: https://www.cdc.gov/vaccines/hcp/imz-schedules/downloads/child/0-18yrs-child-combined-schedule.pdf
+    publisher: CDC
+    doc_type: schedule
+    age_months: [0, 36]
+
+  - doc_id: cdc_parent_immunization_schedule
+    title: CDC Immunization Schedule for Children Birth Through 6 Years, Parent Version
+    url: https://www.cdc.gov/vaccines/imz-schedules/downloads/parent-ver-sch-0-6yrs.pdf
+    publisher: CDC
+    doc_type: schedule
+    age_months: [0, 36]
+
+  - doc_id: nichd_safe_sleep_brochure_2022
+    title: NICHD Safe Sleep for Your Baby, Reduce the Risk of SIDS
+    url: https://www.nichd.nih.gov/sites/default/files/2023-01/STS_2022_Brochure_English.pdf
+    publisher: NICHD
+    doc_type: guidance
+    age_months: [0, 12]
+
+  - doc_id: nichd_safe_to_sleep_brochure
+    title: NICHD Safe to Sleep Brochure
+    url: https://www.nichd.nih.gov/sites/default/files/publications/pubs/Documents/NICHD_Safe_to_Sleep_brochure.pdf
+    publisher: NICHD
+    doc_type: guidance
+    age_months: [0, 12]
+
+  - doc_id: nichd_safe_sleep_baby
+    title: NICHD Safe Sleep for Your Baby Handout
+    url: https://www.nichd.nih.gov/sites/default/files/publications/pubs/Documents/Safe_Sleep_Baby_English.pdf
+    publisher: NICHD
+    doc_type: handout
+    age_months: [0, 12]
+
+  - doc_id: nichd_safe_sleep_infographic
+    title: NICHD Safe Sleep Environment Infographic
+    url: https://safetosleep.nichd.nih.gov/sites/default/files/inline-files/SafeSleepInfographicVertical.pdf
+    publisher: NICHD
+    doc_type: handout
+    age_months: [0, 12]
+
+  - doc_id: usda_wic_infant_feeding_guide
+    title: USDA WIC Infant Nutrition and Feeding Guide
+    url: https://wicworks.fns.usda.gov/sites/default/files/media/document/infant-feeding-guide.pdf
+    publisher: USDA
+    doc_type: guidance
+    age_months: [0, 12]
+
+  - doc_id: cdc_infant_formula_preparation
+    title: CDC How to Prepare and Store Powdered Infant Formula
+    url: https://www.cdc.gov/nutrition/downloads/prepare-store-powered-infant-formula-508.pdf
+    publisher: CDC
+    doc_type: handout
+    age_months: [0, 12]
+
+  - doc_id: cdc_breast_milk_storage_ece
+    title: CDC Storage, Handling, and Preparation of Breast Milk in Early Care and Education Programs
+    url: https://www.cdc.gov/early-care-education/media/pdfs/ECE-Storage-and-handling-Breastmilk-ECE-082022-508.pdf
+    publisher: CDC
+    doc_type: guidance
+    age_months: [0, 24]
+
+  - doc_id: cdc_breast_milk_storage
+    title: CDC Breast Milk Storage Guidance
+    url: https://www.cdc.gov/infant-feeding-emergencies-toolkit/media/Breast-milk-storage-IYCF-E-508.pdf
+    publisher: CDC
+    doc_type: handout
+    age_months: [0, 12]

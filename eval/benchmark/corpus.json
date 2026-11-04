@@ -1,0 +1,101 @@
+{
+  "cdc_milestone_checklists": {
+    "url": "https://www.cdc.gov/act-early/media/pdfs/2025/10/cdc-milestone-checklists-ltsae-english-508.pdf",
+    "sha256": "40b10b8a0fc05ca2ccf6d3a830bc7ed3b8c5f005c6fbf59d67af864016f7ed9a",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 50,
+      "section": 37
+    }
+  },
+  "cdc_child_immunization_schedule": {
+    "url": "https://www.cdc.gov/vaccines/hcp/imz-schedules/downloads/child/0-18yrs-child-combined-schedule.pdf",
+    "sha256": "96159043a4ebc04444c349704a783b4d5a76ec96843ed4e64876d5317bb2a1dd",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 60,
+      "section": 81
+    }
+  },
+  "cdc_parent_immunization_schedule": {
+    "url": "https://www.cdc.gov/vaccines/imz-schedules/downloads/parent-ver-sch-0-6yrs.pdf",
+    "sha256": "7a18397a2fe79b5033e8e965340f0062d03a2b30111f4bb4bd052993a3619e51",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 0,
+      "section": 0
+    }
+  },
+  "nichd_safe_sleep_brochure_2022": {
+    "url": "https://www.nichd.nih.gov/sites/default/files/2023-01/STS_2022_Brochure_English.pdf",
+    "sha256": "19a372db0d757619c687386c2ad8d34cae9d4d4bdc277a051e3b5986bdb30a44",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 19,
+      "section": 22
+    }
+  },
+  "nichd_safe_to_sleep_brochure": {
+    "url": "https://www.nichd.nih.gov/sites/default/files/publications/pubs/Documents/NICHD_Safe_to_Sleep_brochure.pdf",
+    "sha256": "7891d59b9dccfb457f3be3ae090168c579ca021e82c85bfad93766e1443eccdd",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 15,
+      "section": 18
+    }
+  },
+  "nichd_safe_sleep_baby": {
+    "url": "https://www.nichd.nih.gov/sites/default/files/publications/pubs/Documents/Safe_Sleep_Baby_English.pdf",
+    "sha256": "658752a85d5d7603671de0dd70a2e91694c70733eac158da1a0f762964fd8df8",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 8,
+      "section": 10
+    }
+  },
+  "nichd_safe_sleep_infographic": {
+    "url": "https://safetosleep.nichd.nih.gov/sites/default/files/inline-files/SafeSleepInfographicVertical.pdf",
+    "sha256": "55de87e2ee98a06f5b189d8f31f9f9f775a09e004bc7ffa731d2e2dcb515efb9",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 2,
+      "section": 3
+    }
+  },
+  "usda_wic_infant_feeding_guide": {
+    "url": "https://wicworks.fns.usda.gov/sites/default/files/media/document/infant-feeding-guide.pdf",
+    "sha256": "d0c043cc70dedf16920673f57cc4771692974db30761df351faec4e56db45b1d",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 610,
+      "section": 943
+    }
+  },
+  "cdc_infant_formula_preparation": {
+    "url": "https://www.cdc.gov/nutrition/downloads/prepare-store-powered-infant-formula-508.pdf",
+    "sha256": "21cda7eeca50d6f1ebf272e2fbef170601a902a56626feaef63feba90473a3c3",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 3,
+      "section": 6
+    }
+  },
+  "cdc_breast_milk_storage_ece": {
+    "url": "https://www.cdc.gov/early-care-education/media/pdfs/ECE-Storage-and-handling-Breastmilk-ECE-082022-508.pdf",
+    "sha256": "8b2f8b965463d0543b3b90536c676be2b42b28ebca1d3bb244565b7b30d0e0f9",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 4,
+      "section": 5
+    }
+  },
+  "cdc_breast_milk_storage": {
+    "url": "https://www.cdc.gov/infant-feeding-emergencies-toolkit/media/Breast-milk-storage-IYCF-E-508.pdf",
+    "sha256": "4ac5e617e266b6e4d5049c49a9883b0b49a4e721e0926856b91e10ba373e2f64",
+    "retrieved_at": "2026-08-07",
+    "chunks": {
+      "fixed": 0,
+      "section": 0
+    }
+  }
+}

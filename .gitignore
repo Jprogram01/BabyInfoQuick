@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.env
+.env.host
+dist/
+data/raw/
+data/parsed/
+data/chunks/
+data/bm25/
+data/logs/
+eval/results/

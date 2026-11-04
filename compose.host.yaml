@@ -1,0 +1,72 @@
+name: babyinfoquick-host
+
+x-app: &app
+  image: babyinfoquick-host:local
+  build: .
+  environment: &env
+    QDRANT_URL: http://qdrant:6333
+    QUERY_LOGGING: "false"
+  depends_on:
+    qdrant:
+      condition: service_healthy
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.19.0
+    restart: unless-stopped
+    volumes:
+      - vectors:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec 'exec 3<>/dev/tcp/127.0.0.1/6333; printf \"GET /readyz HTTP/1.0\\r\\n\\r\\n\" >&3; head -1 <&3 | grep -q \" 200 \"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  init:
+    <<: *app
+    profiles: [setup]
+    volumes:
+      - corpus:/app/data
+      - models:/var/cache/babyinfoquick
+    command: ["sh", "/app/deploy/init.sh"]
+
+  web:
+    <<: *app
+    restart: unless-stopped
+    environment:
+      <<: *env
+      MAX_ASKS_PER_MINUTE: "20"
+      OPENAI_API_KEY: ${HOST_OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${HOST_ANTHROPIC_API_KEY:-}
+    volumes:
+      - corpus:/app/data:ro
+      - models:/var/cache/babyinfoquick
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/ready', timeout=4)"]
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 15s
+
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?Set SITE_ADDRESS to the public DNS name}
+    ports:
+      - "${HTTP_BIND:-80}:80"
+      - "${HTTPS_BIND:-443}:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - certificates:/data
+      - caddy_config:/config
+
+volumes:
+  vectors:
+  corpus:
+  models:
+  certificates:
+  caddy_config:

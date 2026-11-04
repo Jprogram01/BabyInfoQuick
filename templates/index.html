@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BabyInfoQuick</title>
+  <style>
+    :root { color-scheme: light dark; --fg: #1a1a1a; --muted: #666; --bg: #fdfdfc; --line: #e2e0da; --accent: #2f5d50; }
+    @media (prefers-color-scheme: dark) {
+      :root { --fg: #e8e6e1; --muted: #9a9790; --bg: #16171a; --line: #2e3034; --accent: #7fc0aa; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 2rem 1.25rem 4rem; background: var(--bg); color: var(--fg);
+           font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; }
+    main { max-width: 46rem; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin: 0 0 .25rem; }
+    .sub { color: var(--muted); margin: 0 0 2rem; font-size: .9rem; }
+    form { display: grid; gap: .75rem; margin-bottom: 2rem; }
+    .row { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .row > label { flex: 1 1 12rem; font-size: .8rem; color: var(--muted); }
+    input[type=text], select { width: 100%; padding: .6rem .7rem; font: inherit; font-size: .95rem;
+           background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; }
+    button { padding: .6rem 1.2rem; font: inherit; font-weight: 600; cursor: pointer;
+             background: var(--accent); color: var(--bg); border: 0; border-radius: 6px; justify-self: start; }
+    .answer { border-left: 3px solid var(--accent); padding: .25rem 0 .25rem 1rem; margin-bottom: 1.5rem; white-space: pre-wrap; }
+    .unanswered { border-left-color: var(--muted); color: var(--muted); }
+    h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 2rem 0 .6rem; }
+    ol { padding-left: 1.4rem; margin: 0; }
+    li { margin-bottom: .6rem; font-size: .9rem; }
+    li a { color: var(--accent); }
+    .meta { font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .meta span { margin-right: 1rem; white-space: nowrap; }
+    .disclaimer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
+                  font-size: .82rem; color: var(--muted); }
+    .benchmark { margin-top: 2rem; padding: 1rem 0; border-block: 1px solid var(--line); }
+    summary { cursor: pointer; }
+    .scroll { overflow-x: auto; }
+    table { width: 100%; font-variant-numeric: tabular-nums; border-collapse: collapse; font-size: .85rem; }
+    th, td { padding: .5rem; text-align: right; border-bottom: 1px solid var(--line); }
+    th:first-child, td:first-child { text-align: left; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>BabyInfoQuick</h1>
+  <p class="sub">A retrieval portfolio demo. Explore passages from CDC, NICHD, and USDA WIC by question and age band.</p>
+
+  <form method="post">
+    <label for="question">Question</label>
+    <input id="question" type="text" name="question" value="{{ question }}" placeholder="When can my baby start solid foods?" required autofocus>
+    <div class="row">
+      <label>Age band
+        <select name="age_band">
+          <option value="">Detect from the question</option>
+          {% for value, text in bands %}
+          <option value="{{ value }}" {% if value == age_band %}selected{% endif %}>{{ text }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Retrieval config
+        <select name="config">
+          {% for name in configs %}
+          <option value="{{ name }}" {% if name == config %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+    <button type="submit">Ask</button>
+  </form>
+
+  {% if answer %}
+    <div class="answer{% if not answer.answered %} unanswered{% endif %}">{{ answer.text }}</div>
+
+    {% if answer.retrieved_passages %}
+    <h2>Retrieved passages</h2>
+    <ol>
+      {% for match in answer.retrieved_passages %}
+      <li>
+        <a href="{{ match.chunk.url }}#page={{ match.chunk.page_start }}" target="_blank" rel="noopener">{{ match.chunk.title }}</a>
+        &mdash; {{ match.chunk.publisher }}, PDF p. {{ match.chunk.page_start }}
+        <details><summary>{{ match.chunk.section or "Read passage" }}</summary><p>{{ match.chunk.text }}</p></details>
+      </li>
+      {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if answer.citations %}
+    <h2>Sources</h2>
+    <ol>
+      {% for c in answer.citations %}
+      <li value="{{ c.marker }}">
+        <a href="{{ c.url }}#page={{ c.page_start }}" target="_blank" rel="noopener">{{ c.title }}</a>
+        &mdash; {{ c.publisher }}, p. {{ c.page_start }}
+      </li>
+      {% endfor %}
+    </ol>
+    {% endif %}
+
+    <h2>Trace</h2>
+    <p class="meta">
+      <span>config {{ answer.config_name }}</span>
+      <span>age {{ answer.age_bands | map(attribute='value') | join(', ') or 'none' }} ({{ result.age_source }})</span>
+      <span>retrieval {{ '%.0f' | format(answer.retrieval_ms) }} ms</span>
+      <span>total {{ '%.0f' | format(answer.total_ms) }} ms</span>
+      <span>tokens {{ answer.input_tokens }} in / {{ answer.output_tokens }} out</span>
+    </p>
+
+  {% endif %}
+  {% if benchmark %}
+  <details class="benchmark">
+    <summary>Compare retrieval configurations</summary>
+    <p>Recorded local benchmark on {{ benchmark[0].retrieval.n }} questions. Recall@5 counts questions with a labeled passage in the first five results.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Configuration</th><th>Recall@5</th><th>MRR</th><th>p95 retrieval</th></tr></thead>
+      <tbody>{% for row in benchmark %}
+        <tr><td>{{ row.config_name }}</td><td>{{ '%.0f%%' | format(row.retrieval.recall_at_5 * 100) }}</td>
+          <td>{{ '%.3f' | format(row.retrieval.mrr) }}</td><td>{{ '%.0f' | format(row.operational.p95_retrieval_ms) }} ms</td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+  </details>
+  {% endif %}
+  <p class="disclaimer">{{ answer.disclaimer if answer else disclaimer }}</p>
+</main>
+</body>
+</html>
