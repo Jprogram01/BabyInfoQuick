@@ -1,39 +1,30 @@
 # BabyInfoQuick
 
-BabyInfoQuick is a local portfolio demo for retrieval over pediatric guidance. Type a question, select an age band or let the app infer it, and inspect the passages returned from CDC, NICHD and USDA WIC PDFs. With a provider key, the app can also generate a cited answer from those passages.
+A small RAG app for questions about baby care. It searches PDFs from the CDC, NICHD, and USDA WIC, then shows the relevant text and links to the source pages. Add an OpenAI or Anthropic key and it can write an answer with citations.
 
-## Benchmark
+I built this to get more hands-on experience with retrieval and evaluation. The main thing I wanted to test was age filtering. Advice for a newborn and a 9-month-old can sound similar, so the app uses age tags to narrow the search.
 
-Five configurations were each run on the same 100 answerable questions. Thirty-one questions are age-sensitive and 69 are age-agnostic. The set combines 12 revised seed questions with 88 model-authored additions checked against the source PDFs. It has not had independent human adjudication. Each point of overall recall represents one question.
+## Results
 
-| Config | Recall@5 | MRR | Age-sensitive R@5 | Age-agnostic R@5 | Answer accuracy | p95 retrieval | Cost/query |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| dense_fixed | 0.640 | 0.437 | 0.677 | 0.623 | not run | 106 ms | not measured |
-| dense_section | 0.650 | 0.477 | 0.613 | 0.667 | not run | 105 ms | not measured |
-| hybrid | 0.630 | 0.425 | 0.548 | 0.667 | not run | 112 ms | not measured |
-| hybrid_rerank | 0.710 | 0.437 | 0.710 | 0.710 | not run | 8812 ms | not measured |
-| hybrid_rerank_no_age_filter | 0.630 | 0.382 | 0.452 | 0.710 | not run | 8224 ms | not measured |
+I compared five setups on 100 questions. “Found in top 5” means at least one labeled passage showed up in the first five results. On my CPU, 95% of searches finished within the time listed.
 
-**Dense section retrieval is the demo default.** It put a labeled passage in the top five for 65 questions, with 105 ms p95 retrieval latency on this CPU. Hybrid reranking reached 71 questions at 8.8 seconds p95. Dense section retrieval had the highest MRR on this set.
+| Setup | Found in top 5 | MRR | p95 search time |
+| --- | --- | --- | --- |
+| Dense search, fixed chunks | 64% | 0.437 | 106 ms |
+| Dense search, section chunks | 65% | 0.477 | 105 ms |
+| Hybrid search | 63% | 0.425 | 112 ms |
+| Hybrid + reranking | 71% | 0.437 | 8.8 s |
+| Hybrid + reranking, age filter off | 63% | 0.382 | 8.2 s |
 
-**Age filtering made its largest difference on the age-sensitive subset.** With the same reranker, top-five hits rose from 14 to 22 of 31 when filtering was enabled. Among the 33 questions with an explicit age label, all returned passages overlapped the requested metadata in 33 cases with filtering and 9 without it. These are retrieval measurements. Answer quality, end-to-end generation latency and API cost were unmeasured because the run used no provider key.
+The app defaults to dense search with section chunks. Reranking found more of the labeled passages, but it was much slower. For the 31 questions where age mattered, turning the age filter on improved top-five hits from 14 to 22.
 
-## Run the local demo
+The test set started with 12 questions. The other 88 were AI-assisted and checked against the PDFs. They still need independent human review. These results measure retrieval. I haven't measured generated-answer accuracy or API cost.
 
-For a publicly accessible instance, follow the [Linux hosting guide](docs/hosting.md). The hosted stack runs the app, Qdrant and an HTTPS reverse proxy together.
+The [evaluation notes](eval/README.md) explain the metrics. The [saved results](eval/benchmark/) and [failure analysis](docs/failure-analysis.md) show what worked and what still needs work.
 
-On this configured checkout, start Docker Desktop, then run these commands from the project directory in PowerShell.
+## Run it
 
-```powershell
-docker compose up -d
-.\.venv\Scripts\biq.exe serve
-```
-
-Open [the local demo](http://127.0.0.1:8000). Try “How do I thaw frozen breast milk?” and expand a passage to inspect its text. The source link opens the PDF at the start page of the chunk. Try “What can my 9 month old do?” to see which age band the retriever selected. The comparison table on the page shows the recorded benchmark.
-
-### First-time setup
-
-Install Python 3.11 or newer and Docker with Compose. Run the following from the project root in PowerShell.
+You'll need Python 3.11+ and Docker. Start Docker, then run this from the project folder in PowerShell.
 
 ```powershell
 python -m venv .venv
@@ -47,29 +38,30 @@ biq index --config dense_fixed
 biq serve
 ```
 
-On macOS or Linux, activate the environment with `source .venv/bin/activate`. The initial build downloads the public PDFs and model weights. The four section-based configurations share one Qdrant collection and BM25 index. The fixed-window configuration uses its own collection. Indexing replaces the selected collection. For the text-only benchmark, use the parse command shown above. To enable OCR for a separate run, install Tesseract, run `biq parse` and rebuild both indexes.
+On macOS or Linux, use `source .venv/bin/activate` to activate the environment.
 
-### Answer generation
+The first setup downloads the PDFs and models, then builds both indexes. This takes a while on CPU. After that, you just need Docker running and `biq serve`.
 
-Without a provider key, the demo shows ranked source passages with their PDF links. To enable generated answers, set either `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in the project's `.env` file or environment and restart the app. With the bundled configurations an OpenAI key selects `gpt-4o-mini` and an Anthropic key selects `claude-opus-5`. If both are present, Anthropic is the default. Set `generation.provider` in a retrieval YAML to choose explicitly. Answer generation and evaluation with `--judge` use paid API calls.
+Open [localhost:8000](http://127.0.0.1:8000). Try “How do I thaw frozen breast milk?” or “What can my 9 month old do?”
+
+To get generated answers, put either `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in a local `.env` file and restart the app. If both are set, it uses Anthropic. You can choose a provider and model in the YAML files under `configs/`. API calls cost money.
+
+## Other commands
 
 ```bash
 biq configs
-biq ask "How do I thaw frozen breast milk?" --config hybrid --show-chunks
-biq ask "What can my 9 month old do?" --age infant_7_12
+biq ask "How do I thaw frozen breast milk?" --show-chunks
 biq eval --check-labels
 biq eval
 python -m pytest -q
 ```
 
-`POST /api/ask` accepts JSON with a question, an optional configuration name and optional age bands. The interactive schema and examples of the response fields are available in the [local API docs](http://127.0.0.1:8000/docs).
+`biq eval --judge` also generates and grades answers using the selected provider. It needs an API key.
 
-## What the benchmark compares
+The API is available at `POST /api/ask`. You can try it in the [local API docs](http://127.0.0.1:8000/docs).
 
-Fixed windows and section-aware chunks carry source, PDF page range and age-band metadata. At query time, the app resolves age from the selection or question and applies a metadata filter during vector search and before lexical top-k selection. Hybrid retrieval combines dense and BM25 ranks with reciprocal rank fusion. The optional cross-encoder scores up to 20 candidates before the final cutoff. A fifth configuration repeats reranking with age filtering disabled.
+## Hosting
 
-Qdrant stores the vectors. The BM25 index, parsed PDFs, chunks and per-query diagnostic logs are local under `data/`. Interactive query logs include question text and component scores. Evaluation traces identify which labeled passages each configuration retrieved. See the [evaluation protocol](eval/README.md), [recorded reports and traces](eval/benchmark/) and [failure analysis](docs/failure-analysis.md).
+The [hosting guide](docs/hosting.md) covers running it on a Linux server with Docker. The package includes the app, Qdrant, and an HTTPS proxy.
 
-## Scope
-
-This is an informational retrieval experiment. The source snapshot is dated August 2026. Generated answers carry a disclaimer and require resolvable inline passage citations. The prompt calls for refusal on diagnoses, medication dosages and emergency instructions. Empty retrieval skips the generator. Clinical accuracy and claim-level faithfulness have not been independently assessed.
+This is a learning project. The source documents were downloaded in August 2026. It isn't medical advice.
